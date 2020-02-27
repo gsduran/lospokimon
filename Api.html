@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Pokedex</title>
+    <meta name="description" content="Pokemon">
+    <script type="text/javascript" src="https://code.jquery.com/jquery-3.2.1.min.js"
+        integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous">
+        </script>
+    <script type="text/javascript" src="https://canvasjs.com/assets/script/jquery.canvasjs.min.js"></script>
+
+    <script type="text/javascript">
+
+        function buscapokemon() {
+            for (let i = 1; i <= 151; i++) {
+                $('#images').append(`<img id="${i}" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${i}.png">`);
+            }
+        }
+        $(document).ready(function () {
+            buscapokemon();
+            $('.pokedex *').hide();
+            $('#images img').on('click', function () {
+                $('.pokedex *').hide();
+                var id = $(this).attr('id');
+                $('ul').html(``);
+                $.get(`http://pokeapi.co/api/v2/pokemon/${id}`, function (pokemon) {
+                    console.log(pokemon);
+                    $('.pokedex h2').text(pokemon.name);
+                    $('#selected').prop('src', `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`);
+
+                    $('.pokedex *').show();
+                });
+            })
+        })
+        var dataPoints = [];
+        var dataPotos = [];
+
+        $(function () {
+            $('#botonPokemon').on('click', function () {
+                var chart = $("#chartContainer").CanvasJSChart();
+                var vacio = [];
+                chart.options.data[0].dataPoints.length = 0;
+                chart.render();
+                $('ul').html(``);
+                var id = $("#pokemonName").val();
+                console.log(id);
+                $.get(`http://pokeapi.co/api/v2/pokemon/${id}`, function (pokemon) {
+                    console.log(pokemon);
+                    $('#name h2').text(pokemon.name);
+                    $('#imagen1').prop('src', `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png`);
+                    for (let i = 0; i < pokemon.types.length; i++) {
+                        $('ul').append(`<li>${pokemon.types[i].type.name}</li>`);
+                    }
+                    for (let i = 0; i < pokemon.stats.length; i++) {
+                        dataPoints.push({ y: pokemon.stats[i].base_stat, label: "speed" });
+                        console.log(pokemon.stats[i].base_stat);
+
+                        var chart = $("#chartContainer").CanvasJSChart();
+                        var length = chart.options.data[0].dataPoints.length;
+                        chart.options.data[0].dataPoints.push({ x: (length + 1) * 10, y: pokemon.stats[i].base_stat, label: pokemon.stats[i].stat.name });
+                        chart.render();
+                    }
+                    console.log(dataPoints);
+                    $("#chartContainer").show();
+
+                });
+            })
+        })
+
+        $(function () {
+            var options = {
+                data: [
+                    {
+                        type: "splineArea",
+                        dataPoints: [
+                        ]
+                    }
+                ]
+            };
+            $("#chartContainer").CanvasJSChart(options);
+        });
+
+
+    </script>
+</head>
+
+<body>
+    <h1>Pokedex</h1>
+    <div>
+        <input type="text" id="pokemonName">
+        <button id="botonPokemon">Busca tu pokemon entero feo</button>
+        <div class="busqueda">
+            <div id="name">
+                <h2></h2>
+            </div>
+            <img id="imagen1" src="" alt="">
+
+            <ul>
+            </ul>
+            <h1>Habilidades</h1>
+            <div class="stads"></div>
+            <div id="chartContainer" style="height: 370px; max-width: 920px; margin: 0px auto;"></div>
+        </div>
+
+    </div>
+    <div id="los150">
+        <h1>Estos son los mejores</h1>
+        <div id="images">
+        </div>
+        <h2></h2>
+        <div class="pokedex ">
+            <h2>esta de vio oe zi</h2>
+            <img id="selected" src="" alt="">
+            <h3>esta de vio oe zi</h3>
+
+        </div>
+    </div>
+</body>
+
+</html>
